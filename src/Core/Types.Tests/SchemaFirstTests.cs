@@ -162,6 +162,28 @@ namespace HotChocolate
             result.MatchSnapshot();
         }
 
+        [Fact]
+        public async Task SchemaWithDirective()
+        {
+            // arrange
+            string sourceText = @"
+                type Query {
+                    foo: String @bar(a: 1)
+                }
+                directive @bar(a: Int) on FIELD_DEFINITION";
+
+            // act
+            ISchema schema = SchemaBuilder.New()
+                .AddDocumentFromString(sourceText)
+                .AddResolver("Query", "foo", "abc")
+                .Create();
+
+            // assert
+            IQueryExecutor executor = schema.MakeExecutable();
+            IExecutionResult result = await executor.ExecuteAsync("{ foo }");
+            result.MatchSnapshot();
+        }
+
         public class Query
         {
             public string Hello() => "World";
