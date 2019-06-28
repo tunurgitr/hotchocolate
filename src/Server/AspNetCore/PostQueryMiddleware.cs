@@ -4,13 +4,14 @@ using System.Text;
 using System.Threading.Tasks;
 using HotChocolate.Execution;
 using Newtonsoft.Json;
-using Microsoft.Extensions.DependencyInjection;
+using HotChocolate.Language;
 
 #if ASPNETCLASSIC
 using Microsoft.Owin;
 using HttpContext = Microsoft.Owin.IOwinContext;
 using RequestDelegate = Microsoft.Owin.OwinMiddleware;
 #else
+using System.IO.Pipelines;
 using Microsoft.AspNetCore.Http;
 #endif
 
@@ -52,9 +53,20 @@ namespace HotChocolate.AspNetCore
                     QueryMiddlewareUtilities.ToDictionary(request.Variables));
         }
 
-        private static async Task<QueryRequestDto> ReadRequestAsync(
+        private static async Task<GraphQLRequest> ReadRequestAsync(
             HttpContext context)
         {
+
+            using (Stream stream = context.Request.Body)
+            {
+
+
+
+
+            }
+
+
+
             using (var reader = new StreamReader(context.Request.Body,
                 Encoding.UTF8))
             {
@@ -64,6 +76,7 @@ namespace HotChocolate.AspNetCore
                 switch (context.Request.ContentType.Split(';')[0])
                 {
                     case ContentType.Json:
+
                         return JsonConvert.DeserializeObject<QueryRequestDto>(
                             content, QueryMiddlewareUtilities.JsonSettings);
 
@@ -75,5 +88,47 @@ namespace HotChocolate.AspNetCore
                 }
             }
         }
+
+
+#if !ASPNETCLASSIC
+
+        public async Task FillPipeAsync(Stream request, PipeWriter writer)
+        {
+            const int minimumBufferSize = 512;
+
+            while (true)
+            {
+                // Allocate at least 512 bytes from the PipeWriter
+                Memory<byte> memory = writer.GetMemory(minimumBufferSize);
+                try
+                {
+                    int bytesRead = await request. (memory, SocketFlags.None);
+                    if (bytesRead == 0)
+                    {
+                        break;
+                    }
+                    // Tell the PipeWriter how much was read from the Socket
+                    writer.Advance(bytesRead);
+                }
+                catch (Exception ex)
+                {
+                    LogError(ex);
+                    break;
+                }
+
+                // Make the data available to the PipeReader
+                FlushResult result = await writer.FlushAsync();
+
+                if (result.IsCompleted)
+                {
+                    break;
+                }
+            }
+
+            // Tell the PipeReader that there's no more data coming
+            writer.Complete();
+        }
+
+#endif
     }
 }
