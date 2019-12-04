@@ -227,6 +227,31 @@ namespace HotChocolate.Types.Filters
             schema.ToString().MatchSnapshot();
         }
 
+        [Fact]
+        public void Model_With_Nullable_Properties()
+        {
+            // arrange
+            // act
+            var schema = CreateSchema(
+                new FilterInputType<FooNullable>(
+                    d => d.Filter(f => f.BarShort)));
+
+            // assert
+            schema.ToString().MatchSnapshot();
+        }
+
+        [Fact]
+        public void Infer_Nullable_Fields()
+        {
+            // arrange
+            // act
+            var schema = CreateSchema(
+                new FilterInputType<FooNullable>());
+
+            // assert
+            schema.ToString().MatchSnapshot();
+        }
+
         public enum FooBar
         {
             Foo,
@@ -241,7 +266,18 @@ namespace HotChocolate.Types.Filters
             public float BarFloat { get; set; }
             public double BarDouble { get; set; }
             public decimal BarDecimal { get; set; }
+            public short? BarShortNullable { get; set; }
+            public int? BarIntNullable { get; set; }
+            public long? BarLongNullable { get; set; }
+            public float? BarFloatNullable { get; set; }
+            public double? BarDoubleNullable { get; set; }
+            public decimal? BarDecimalNullable { get; set; }
             public FooBar FooBar { get; set; }
+        }
+
+        public class FooNullable
+        {
+            public short? BarShort { get; set; }
         }
 
         public class Bar
@@ -262,6 +298,12 @@ namespace HotChocolate.Types.Filters
                 descriptor.Filter(x => x.BarFloat);
                 descriptor.Filter(x => x.BarDouble);
                 descriptor.Filter(x => x.BarDecimal);
+                descriptor.Filter(x => x.BarShortNullable);
+                descriptor.Filter(x => x.BarIntNullable);
+                descriptor.Filter(x => x.BarLongNullable);
+                descriptor.Filter(x => x.BarFloatNullable);
+                descriptor.Filter(x => x.BarDoubleNullable);
+                descriptor.Filter(x => x.BarDecimalNullable);
                 descriptor.Filter(x => x.FooBar);
             }
         }

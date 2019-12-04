@@ -40,11 +40,7 @@ namespace StarWars
                 .AddType<HumanType>()
                 .AddType<DroidType>()
                 .AddType<EpisodeType>()
-                .Create(),
-                new QueryExecutionOptions
-                {
-                    TracingPreference = TracingPreference.Always
-                });
+                .Create());
 
 
             // Add Authorization Policy

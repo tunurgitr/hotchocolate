@@ -9,8 +9,13 @@ namespace StrawberryShake
     {
         Type ResultType { get; }
 
-        Task<IOperationResult> ParseAsync(
+        Task ParseAsync(
             Stream stream,
+            IOperationResultBuilder resultBuilder,
             CancellationToken cancellationToken);
+
+        void Parse(
+            ReadOnlySpan<byte> result,
+            IOperationResultBuilder resultBuilder);
     }
 }

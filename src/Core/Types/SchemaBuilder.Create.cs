@@ -1,14 +1,14 @@
-using System.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using HotChocolate.Configuration;
 using HotChocolate.Language;
+using HotChocolate.Properties;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using HotChocolate.Types.Descriptors;
-using HotChocolate.Utilities;
-using HotChocolate.Configuration;
 using HotChocolate.Types.Factories;
-using HotChocolate.Properties;
+using HotChocolate.Utilities;
 
 namespace HotChocolate
 {
@@ -19,7 +19,10 @@ namespace HotChocolate
             IServiceProvider services = _services
                 ?? new EmptyServiceProvider();
 
-            var descriptorContext = DescriptorContext.Create(_options, services);
+            var descriptorContext = DescriptorContext.Create(
+                _options,
+                services,
+                CreateConventions(services));
 
             IBindingLookup bindingLookup =
                  _bindingCompiler.Compile(descriptorContext);
@@ -323,6 +326,20 @@ namespace HotChocolate
             }
 
             return list;
+        }
+
+        private IReadOnlyDictionary<Type, IConvention> CreateConventions(
+            IServiceProvider services)
+        {
+            var serviceFactory = new ServiceFactory { Services = services };
+            var conventions = new Dictionary<Type, IConvention>();
+
+            foreach (KeyValuePair<Type, CreateConvention> item in _conventions)
+            {
+                conventions.Add(item.Key, item.Value(serviceFactory));
+            }
+
+            return conventions;
         }
     }
 }

@@ -16,7 +16,7 @@ namespace HotChocolate.Types.Descriptors
             Definition = new T();
         }
 
-        protected override T Definition { get; }
+        internal protected override T Definition { get; }
 
         protected void SyntaxNode(
             InputValueDefinitionNode inputValueDefinition)
@@ -67,6 +67,17 @@ namespace HotChocolate.Types.Descriptors
             }
 
             Definition.Type = new SchemaTypeReference(inputType);
+        }
+
+        public void Type(ITypeReference typeReference)
+        {
+            if (typeReference == null)
+            {
+                throw new ArgumentNullException(nameof(typeReference));
+            }
+
+
+            Definition.Type = typeReference;
         }
 
         public void Type(ITypeNode typeNode)

@@ -15,12 +15,13 @@
     <PackageId>StrawberryShake.Abstractions</PackageId>
     <AssemblyName>StrawberryShake.Abstractions</AssemblyName>
     <RootNamespace>StrawberryShake</RootNamespace>
+    <PackageIconUrl>https://chillicream.com/img/projects/strawberryshake-signet.png</PackageIconUrl>
     <IsPackable>true</IsPackable>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Text.Json" Version="4.6.0-preview8.19405.3" />
+    <PackageReference Include="System.Text.Json" Version="4.6.0" />
   </ItemGroup>
 
 </Project>
